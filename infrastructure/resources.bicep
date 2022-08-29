@@ -70,7 +70,7 @@ resource apiContainerApp 'Microsoft.App/containerApps@2022-03-01' = {
     template: {
       containers: [
         {
-          image: 'pollstarinttestneuacr.azurecr.io/pollstar-sessions-api${containerVersion}'
+          image: 'pollstarinttestneuacr.azurecr.io/pollstar-sessions-api:${containerVersion}'
           name: 'pollstar-api'
           resources: {
             cpu: json('0.25')
