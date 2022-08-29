@@ -3,7 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "systemName": {
-      "value": "pollstar-sessions-api"
+      "value": "pollstar-sess-api"
     },
     "environmentName": {
       "value": "test"
