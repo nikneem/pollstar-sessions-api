@@ -1,6 +1,6 @@
 using PollStar.Core.Configuration;
 using PollStar.Sessions;
-using PollStar.Users.HealthCheck;
+using PollStar.Sessions.HealthCheck;
 
 const string defaultCorsPolicyName = "default_cors";
 
