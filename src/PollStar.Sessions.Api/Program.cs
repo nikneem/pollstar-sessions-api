@@ -1,29 +1,17 @@
 using PollStar.Core.Configuration;
 using PollStar.Sessions;
+using PollStar.Users.HealthCheck;
 
 const string defaultCorsPolicyName = "default_cors";
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-//var environmentVariables = Environment.GetEnvironmentVariables();
-//var config = new AzureConfiguration();
-//builder.Configuration.GetSection(AzureConfiguration.SectionName).Bind(config);
-//if (!environmentVariables.Contains(EnvironmentVariableName.AzureStorageAccountName))
-//{
-//    Environment.SetEnvironmentVariable(EnvironmentVariableName.AzureStorageAccountName, config.StorageAccount);
-//}
-//if (!environmentVariables.Contains(EnvironmentVariableName.AzureStorageAccountKey))
-//{
-//    Environment.SetEnvironmentVariable(EnvironmentVariableName.AzureStorageAccountKey, config.StorageKey);
-//}
-
 builder.Services.Configure<AzureConfiguration>(
     builder.Configuration.GetSection(AzureConfiguration.SectionName));
-
 builder.Services.AddPollStarSessions();
 
-builder.Services.AddHealthChecks();
+builder.Services.AddHealthChecks()
+    .AddCheck<StorageAccountHealthCheck>("StorageAccountHealthCheck");
 
 builder.Services.AddCors(options =>
 {
