@@ -81,25 +81,6 @@ namespace PollStar.API.Controllers
             return BadRequest();
         }
 
-        //[HttpGet("{id}/polls")]
-        //public async Task<IActionResult> Get(Guid id)
-        //{
-        //    try
-        //    {
-        //        var pollsList = await _pollsService.GetPollsListAsync(id);
-        //        return Ok(pollsList);
-        //    }
-        //    catch (PollStarSessionException psEx)
-        //    {
-        //        if (psEx.ErrorCode == PollStarSessionErrorCode.SessionNotFound)
-        //        {
-        //            return new NotFoundResult();
-        //        }
-        //    }
-
-        //    return BadRequest();
-        //}
-
         [HttpPost]
         public async Task<IActionResult> Post(CreateSessionDto dto)
         {
