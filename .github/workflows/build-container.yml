@@ -52,13 +52,13 @@ jobs:
   publish-bicep:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Compile infrastructure
         uses: Azure/cli@1.0.4
         with:
           inlineScript: az bicep build --file ./infrastructure/main.bicep
       - name: Publish Artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artfact@v3
         with:
           name: bicep-templates
           path: infrastructure/*.json
@@ -68,20 +68,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - name: Download Artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: bicep-templates
           path: ./infrastructure
       - name: Azure Login
-        uses: azure/login@v1.4.0
+        uses: azure/login@v1
         with:
-          creds: ${{ secrets.AZURE_TEST }}
+          creds: ${{ secrets.AZURE_PROD }}
       - name: Deploy Infrastructure
         id: arm
-        uses: Azure/cli@1.0.4
+        uses: Azure/cli@v1
         with:
           inlineScript: az deployment sub create --name $IMAGE_NAME  --location northeurope --template-file ./infrastructure/main.json --parameters ./infrastructure/params.test.json --parameters containerVersion=${{needs.versionize.outputs.semver}}
