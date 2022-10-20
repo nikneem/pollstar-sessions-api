@@ -7,7 +7,7 @@ param integrationResourceGroupName string
 param containerAppEnvironmentResourceName string
 param applicationInsightsResourceName string
 param webPubSubResourceName string
-
+param environmentName string
 param containerPort int = 80
 param containerAppName string = 'pollstar-sessions-api'
 
@@ -87,7 +87,7 @@ resource apiContainerApp 'Microsoft.App/containerApps@2022-03-01' = {
     template: {
       containers: [
         {
-          image: 'pollstarinttestneuacr.azurecr.io/${containerAppName}:${containerVersion}'
+          image: 'pollstarint${environmentName}neuacr.azurecr.io/${containerAppName}:${containerVersion}'
           name: containerAppName
           resources: {
             cpu: json('0.25')
