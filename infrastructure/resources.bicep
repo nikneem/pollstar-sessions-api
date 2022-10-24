@@ -7,6 +7,7 @@ param integrationResourceGroupName string
 param containerAppEnvironmentResourceName string
 param azureAppConfigurationName string
 param developersGroup string
+param azureIntegrationKeyVaultName string
 
 param containerPort int = 80
 param containerAppName string = 'pollstar-sessions-api'
@@ -138,5 +139,13 @@ module storageAccountDataReaderRoleAssignmentForDevelopers 'roleAssignment.bicep
     principalId: developersGroup
     roleDefinitionId: storageAccountDataContributorRole.id
     principalType: 'Group'
+  }
+}
+module keyVaultAccessPolicies 'accessPolicies.bicep' = {
+  name: 'keyVaultAccessPoliciesModule'
+  scope: resourceGroup(integrationResourceGroupName)
+  params: {
+    keyVaultName: azureIntegrationKeyVaultName
+    principalId: apiContainerApp.identity.principalId
   }
 }
