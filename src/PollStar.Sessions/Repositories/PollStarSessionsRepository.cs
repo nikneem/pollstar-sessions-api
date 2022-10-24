@@ -1,8 +1,5 @@
 ﻿using Azure;
-using Azure.Data.Tables;
-using Microsoft.Extensions.Options;
-using PollStar.Core;
-using PollStar.Core.Configuration;
+using PollStar.Core.Factories;
 using PollStar.Sessions.Abstractions.DomainModels;
 using PollStar.Sessions.Abstractions.Repositories;
 using PollStar.Sessions.DomainModels;
@@ -12,14 +9,15 @@ namespace PollStar.Sessions.Repositories;
 
 public class PollStarSessionsRepository : IPollStarSessionsRepository
 {
+    private readonly IStorageTableClientFactory _tableStorageClientFactory;
 
-    private TableClient _tableClient;
     private const string TableName = "sessions";
     private const string PartitionKey = "session";
 
     public async Task<ISession> GetAsync(Guid sessionId)
     {
-        var entity = await _tableClient.GetEntityAsync<SessionTableEntity>(PartitionKey, sessionId.ToString());
+        var tableClient = _tableStorageClientFactory.CreateClient(TableName);
+        var entity = await tableClient.GetEntityAsync<SessionTableEntity>(PartitionKey, sessionId.ToString());
         return new Session(
             Guid.Parse(entity.Value.RowKey),
             entity.Value.SessionCode,
@@ -31,7 +29,8 @@ public class PollStarSessionsRepository : IPollStarSessionsRepository
     public async Task<ISession> GetByCodeAsync(string code)
     {
         var sessions = new List<ISession>();
-        var sessionsQuery = _tableClient.QueryAsync<SessionTableEntity>($"{nameof(SessionTableEntity.PartitionKey)} eq '{PartitionKey}' and {nameof(SessionTableEntity.SessionCode)} eq '{code}'");
+        var tableClient = _tableStorageClientFactory.CreateClient(TableName);
+        var sessionsQuery = tableClient.QueryAsync<SessionTableEntity>($"{nameof(SessionTableEntity.PartitionKey)} eq '{PartitionKey}' and {nameof(SessionTableEntity.SessionCode)} eq '{code}'");
         await foreach (var entitiesPage in sessionsQuery.AsPages())
         {
             sessions.AddRange(entitiesPage.Values.Select(entity =>
@@ -59,7 +58,8 @@ public class PollStarSessionsRepository : IPollStarSessionsRepository
             Timestamp = DateTimeOffset.UtcNow,
             ETag = ETag.All
         };
-        var response = await _tableClient.AddEntityAsync(entity);
+        var tableClient = _tableStorageClientFactory.CreateClient(TableName);
+        var response = await tableClient.AddEntityAsync(entity);
         return !response.IsError;
     }
 
@@ -73,14 +73,8 @@ public class PollStarSessionsRepository : IPollStarSessionsRepository
         throw new NotImplementedException();
     }
 
-    public PollStarSessionsRepository(IOptions<AzureConfiguration> options)
+    public PollStarSessionsRepository(IStorageTableClientFactory tableStorageClientFactory)
     {
-        var accountName = options.Value.StorageAccount;
-        var accountKey = options.Value.StorageKey;
-        var storageUri = new Uri($"https://{accountName}.table.core.windows.net");
-        _tableClient = new TableClient(
-            storageUri,
-            TableName,
-        new TableSharedKeyCredential(accountName, accountKey));
+        _tableStorageClientFactory = tableStorageClientFactory;
     }
 }
