@@ -7,7 +7,7 @@ using PollStar.Sessions.Abstractions.Services;
 using PollStar.Sessions.ErrorCodes;
 using PollStar.Sessions.Exceptions;
 
-namespace PollStar.API.Controllers
+namespace PollStar.Sessions.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
