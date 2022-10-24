@@ -9,7 +9,7 @@ param azureAppConfigurationName string
 param developersGroup string
 
 param containerPort int = 80
-param containerAppName string = 'pollstar-users-api'
+param containerAppName string = 'pollstar-sessions-api'
 
 resource configurationDataReaderRole 'Microsoft.Authorization/roleDefinitions@2018-01-01-preview' existing = {
   scope: resourceGroup()
