@@ -1,5 +1,6 @@
 ﻿using Azure;
 using PollStar.Core.Factories;
+using PollStar.Sessions.Abstractions.DataTransferObjects;
 using PollStar.Sessions.Abstractions.DomainModels;
 using PollStar.Sessions.Abstractions.Repositories;
 using PollStar.Sessions.DomainModels;
@@ -24,6 +25,28 @@ public class PollStarSessionsRepository : IPollStarSessionsRepository
             Guid.Parse(entity.Value.UserId),
             entity.Value.Name,
             entity.Value.Description);
+    }
+
+    public async Task<List<SessionDto>> ListAsync(Guid userId)
+    {
+        var sessions = new List<SessionDto>();
+        var tableClient = _tableStorageClientFactory.CreateClient(TableName);
+        var sessionsQuery = tableClient.QueryAsync<SessionTableEntity>($"{nameof(SessionTableEntity.PartitionKey)} eq '{PartitionKey}' and {nameof(SessionTableEntity.UserId)} eq '{userId}'");
+        await foreach (var entitiesPage in sessionsQuery.AsPages())
+        {
+            sessions.AddRange(entitiesPage.Values.Select(entity =>
+                new SessionDto
+                {
+                    Id = Guid.Parse(entity.RowKey),
+                    Code = entity.SessionCode,
+                    Name = entity.Name,
+                    Description = entity.Description,
+                    IsOwner = true
+                }
+            ));
+        }
+
+        return sessions;
     }
 
     public async Task<ISession> GetByCodeAsync(string code)

@@ -16,6 +16,25 @@ namespace PollStar.Sessions.Api.Controllers
         private readonly IPollStarSessionsService _service;
         private readonly IOptions<AzureConfiguration> _cloudConfiguration;
 
+        [HttpGet]
+        public async Task<IActionResult> List([FromQuery] Guid userId)
+        {
+            try
+            {
+                var service = await _service.ListSessionsAsync(userId);
+                return Ok(service);
+            }
+            catch (PollStarSessionException psEx)
+            {
+                if (psEx.ErrorCode == PollStarSessionErrorCode.SessionNotFound)
+                {
+                    return new NotFoundResult();
+                }
+            }
+
+            return BadRequest();
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(Guid id, [FromQuery] Guid userId)
         {
